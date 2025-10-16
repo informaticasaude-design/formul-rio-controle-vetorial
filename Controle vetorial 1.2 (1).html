@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Vetorial - Formulário Tablet</title>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 15px;
+            background-color: #f0f5ff;
+        }
+        .container {
+            max-width: 100%;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #0066cc;
+            background: linear-gradient(to right, #0066cc, #0099ff);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            margin: 0 0 10px 0;
+        }
+        .header h2 {
+            font-size: 1.2rem;
+            margin: 5px 0;
+            font-weight: normal;
+        }
+        .form-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .section-title {
+            background-color: #0066cc;
+            color: white;
+            padding: 10px 15px;
+            margin: -15px -15px 15px -15px;
+            border-radius: 6px 6px 0 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-title span {
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+        .form-group {
+            flex: 1 0 200px;
+            margin-bottom: 10px;
+        }
+        .form-group-full {
+            flex: 1 0 100%;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #0066cc;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 5px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-item input {
+            width: auto;
+            margin-right: 8px;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #e6f2ff;
+            font-weight: 600;
+        }
+        .btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover {
+            background-color: #0055aa;
+        }
+        .btn-reset {
+            background-color: #cc0000;
+        }
+        .btn-reset:hover {
+            background-color: #aa0000;
+        }
+        .btn-success {
+            background-color: #00aa44;
+        }
+        .btn-success:hover {
+            background-color: #008833;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .legend {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 8px;
+            line-height: 1.4;
+            padding: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        .required::after {
+            content: " *";
+            color: red;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            margin-right: 5px;
+            background-color: #f0f0f0;
+        }
+        .tab.active {
+            background-color: #0066cc;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #e6f2ff;
+        }
+        .notification {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .notification.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .notification.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        @media (max-width: 768px) {
+            .form-group {
+                flex: 1 0 100%;
+            }
+            .btn-container {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PROGRAMA NACIONAL DE CONTROLE DA DENGUE - PNCD</h1>
+            <h2>RESUMO DIÁRIO DO SERVIÇO ANTIVETORIAL</h2>
+            <p>Secretaria Municipal de Saúde de Patos - PB</p>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab active" data-tab="form">Formulário</div>
+            <div class="tab" data-tab="data">Dados Registrados</div>
+            <div class="tab" data-tab="export">Exportar Dados</div>
+        </div>
+
+        <div id="notification" class="notification"></div>
+
+        <!-- ABA 1: FORMULÁRIO -->
+        <div id="form-tab" class="tab-content active">
+            <form id="controleVetorialForm">
+                <!-- Seção 1: Informações Gerais -->
+                <div class="form-section">
+                    <div class="section-title">
+                        INFORMAÇÕES GERAIS
+                        <span>Dados básicos da atividade</span>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="municipio" class="required">Município</label>
+                            <input type="text" id="municipio" name="municipio" value="Patos" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="localidade" class="required">Localidade</label>
+                            <select id="localidade" name="localidade" required>
+                                <option value="">Selecione</option>
+                                <option value="Ana Leite - 238">Ana Leite 238</option>
+                                <option value="Alto da Tubiba - 003">Alto da Tubiba 003</option>
+                                <option value="Bairro dos Estados - 242">Bairro dos Estados 242</option>
+                                <option value="Belo Horizonte - 009">Belo Horizonte 009</option>
+                                <option value="Boa Esperança">Boa Esperança</option>
+                                <option value="Brasília - 016">Brasília 016</option>
+                                <option value="Bivar Olintho - 031">Bivar Olintho 031</option>
+                                <option value="Centro - 084">Centro 084</option>
+                                <option value="Conjunto dos Sapateiros - 239">Conjunto dos Sapateitos 239</option>
+                                <option value="Conjunto Itatiunga - 051">Conjunto Itatiunga 051</option>
+                                <option value="Distrito de Santa Gertrudes - 112">Distrito de Santa Gertrudes 112</option>
+                                <option value="Distrito Industrial - 162">Distrito Industrial 162</option>
+                                <option value="Jardim Bela Vista - 212">Jardim Bela Vista 212</option>
+                                <option value="Jardim Europa">Jardim Europa</option>
+                                <option value="Jardim Planalto">Jardim Planalto</option>
+                                <option value="Jardim Magnólia - 219">Jardim Magnólia 219</option>
+                                <option value="Jatobá - 157">Jatobá 157</option>
+                                <option value="Liberdade - 067">Liberdade 067</option>
+                                <option value="Luar de Angelita - 240">Luar de Angelita 240</option>
+                                <option value="Luar do Campestre - 999">Luar do Campestre 999</option>
+                                <option value="Maternidade - 002">Maternidade 002</option>
+                                <option value="Morro - 230">Morro 230</option>
+                                <option value="Morada do Sol - 201">Morada do Sol 201</option>
+                                <option value="Monte Castelo - 073">Monte Castelo 073</option>
+                                <option value="Nova Conquista - 154">Nova Conquista 154</option>
+                                <option value="Novo Horizonte - 159">Novo Horizente 159</option>
+                                <option value="Noé Trajano - 149">Noé Trajano 149</option>
+                                <option value="Salgadinho - 109">Salgadinho 109</option>
+                                <option value="Santo Antonio - 234">Santo Antonio 234</option>
+                                <option value="Santa Cecília - 200">Santa Cecília 200</option>
+                                <option value="São Sebastião - 119">São Sebastião 119</option>
+                                <option value="Sete Casas - 205">Sete Casas 205</option>
+                                <option value="Zona Rural">Zona Rural</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoriaLocalidade" class="required">Categoria da Localidade</label>
+                            <select id="categoriaLocalidade" name="categoriaLocalidade" required>
+                                <option value="">Selecione</option>
+                                <option value="1">Bairro</option>
+                                <option value="2">Sítio</option>
+                                <option value="3">Fazenda</option>
+                                <option value="4">Outros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="zona" class="required">Nº e Nome da Zona</label>
+                            <input type="text" id="zona" name="zona" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dataAtividade" class="required">Data da Atividade</label>
+                            <input type="date" id="dataAtividade" name="dataAtividade" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="zonaConcluida" class="required">Zona Concluída?</label>
+                            <select id="zonaConcluida" name="zonaConcluida" required>
+                                <option value="">Selecione</option>
+                                <option value="S">Sim</option>
+                                <option value="N">Não</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="atividade" class="required">Atividade</label>
+                            <select id="atividade" name="atividade" required>
+                                <option value="">Selecione</option>
+                                <option value="1">LI - Levantamento de Índice</option>
+                                <option value="4">T - Tratamento</option>
+                                <option value="2">LI+T - Levantamento de Índice + Tratamento</option>
+                                <option value="5">DF - Delimitação de Foco</option>
+                                <option value="3">PE - Ponto Estratégico</option>
+                                <option value="6">PVE - Pesquisa Vetorial Especial</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quarteirao" class="required">Nº do Quarteirão</label>
+                            <input type="text" id="quarteirao" name="quarteirao" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção 2: Pesquisa Entomológica / Tratamento -->
+                <div class="form-section">
+                    <div class="section-title">
+                        PESQUISA ENTOMOLÓGICA / TRATAMENTO
+                        <span>Dados de campo</span>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="horaVisita" class="required">Hora da Visita</label>
+                            <input type="time" id="horaVisita" name="horaVisita" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipoVisita" class="required">Tipo de Visita</label>
+                            <select id="tipoVisita" name="tipoVisita" required>
+                                <option value="">Selecione</option>
+                                <option value="N">Normal</option>
+                                <option value="R">Recuperada</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pendencia">Pendência</label>
+                            <select id="pendencia" name="pendencia">
+                                <option value="">Nenhuma</option>
+                                <option value="F">Fechado</option>
+                                <option value="R">Recusa</option>
+                                <option value="D">Desabitado</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tipoImovel" class="required">Tipo do Imóvel</label>
+                            <select id="tipoImovel" name="tipoImovel" required>
+                                <option value="">Selecione</option>
+                                <option value="residencia">Residência</option>
+                                <option value="comercio">Comércio</option>
+                                <option value="terreno">Terreno Baldio</option>
+                                <option value="pontoEstrategico">Ponto Estratégico</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="depositosInspecionados">Nº de Depósitos Inspecionados</label>
+                            <input type="number" id="depositosInspecionados" name="depositosInspecionados" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group-full">
+                            <label>Depósitos Inspecionados por Tipo</label>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>A1</th>
+                                            <th>A2</th>
+                                            <th>B</th>
+                                            <th>C</th>
+                                            <th>D1</th>
+                                            <th>D2</th>
+                                            <th>E</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="depA1" min="0" value="0"></td>
+                                            <td><input type="number" name="depA2" min="0" value="0"></td>
+                                            <td><input type="number" name="depB" min="0" value="0"></td>
+                                            <td><input type="number" name="depC" min="0" value="0"></td>
+                                            <td><input type="number" name="depD1" min="0" value="0"></td>
+                                            <td><input type="number" name="depD2" min="0" value="0"></td>
+                                            <td><input type="number" name="depE" min="0" value="0"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="legend">
+                                <strong>Legenda:</strong> A1 - Caixa d'água (elevado) | A2 - Outros depósitos de armazenamento de água (baixo) |
+                                B - Pequenos depósitos móveis | C - Depósitos fixos |
+                                D1 - Pneus e outros materiais rodantes | D2 - Lixo, entulho, sucatas |
+                                E - Depósitos naturais
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="imoveisInspecionados">Imóveis Inspecionados (LI)</label>
+                            <input type="number" id="imoveisInspecionados" name="imoveisInspecionados" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="imoveisTratados">Imóveis Tratados</label>
+                            <input type="number" id="imoveisTratados" name="imoveisTratados" min="0" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Coleta de Amostra</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="coletaAmostra" name="coletaAmostra">
+                                    <label for="coletaAmostra">Realizada</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="numeroAmostra">Nº da Amostra</label>
+                            <input type="text" id="numeroAmostra" name="numeroAmostra">
+                        </div>
+                        <div class="form-group">
+                            <label for="quantidadeTubitos">Quantidade de Tubitos</label>
+                            <input type="number" id="quantidadeTubitos" name="quantidadeTubitos" min="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção 3: Tratamento -->
+                <div class="form-section">
+                    <div class="section-title">
+                        TRATAMENTO
+                        <span>Dados de aplicação</span>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group-full">
+                            <label>Tratamento Focal (Larvicida)</label>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="tipoLarvicida">Tipo (L1)</label>
+                                    <select id="tipoLarvicida" name="tipoLarvicida">
+                                        <option value="">Selecione</option>
+                                        <option value="Pyriproxyfen">Pyriproxyfen</option>
+                                        <option value="Bti">Bti (Bacillus thuringiensis)</option>
+                                        <option value="Temephos">Temephos</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="quantidadeLarvicida">Quantidade (Carga)</label>
+                                    <input type="number" id="quantidadeLarvicida" name="quantidadeLarvicida" min="0" value="0" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label for="depositosTratadosLarvicida">Qtde. Dep. Trat.</label>
+                                    <input type="number" id="depositosTratadosLarvicida" name="depositosTratadosLarvicida" min="0" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group-full">
+                            <label>Tratamento Perifocal (Adulticida)</label>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="tipoAdulticida">Tipo</label>
+                                    <select id="tipoAdulticida" name="tipoAdulticida">
+                                        <option value="">Selecione</option>
+                                        <option value="Fludora">Fludora</option>
+                                        <option value="Alfacypermetrina">Alfacypermetrina</option>
+                                        <option value="Deltametrina">Deltametrina</option>
+                                        <option value="Cipermethrina">Cipermethrina</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="quantidadeAdulticida">Quantidade (Cargas)</label>
+                                    <input type="number" id="quantidadeAdulticida" name="quantidadeAdulticida" min="0" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="depositosEliminados">Depósitos Eliminados (Trat. Mecânico)</label>
+                            <input type="number" id="depositosEliminados" name="depositosEliminados" min="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção 4: Assinaturas -->
+                <div class="form-section">
+                    <div class="section-title">
+                        ASSINATURAS
+                        <span>Responsáveis pela atividade</span>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="assinaturaAgente" class="required">Assinatura do Agente</label>
+                            <input type="text" id="assinaturaAgente" name="assinaturaAgente" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="assinaturaSupervisor" class="required">Assinatura do Supervisor</label>
+                            <input type="text" id="assinaturaSupervisor" name="assinaturaSupervisor" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de ação -->
+                <div class="btn-container">
+                    <button type="button" class="btn" id="btnSalvar">
+                        <span>💾 Salvar Registro</span>
+                    </button>
+                    <button type="reset" class="btn btn-reset">
+                        <span>🗑️ Limpar Formulário</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ABA 2: DADOS REGISTRADOS -->
+        <div id="data-tab" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">
+                    DADOS REGISTRADOS
+                    <span>Registros salvos no sistema</span>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="registrosTable">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Localidade</th>
+                                <th>Zona</th>
+                                <th>Atividade</th>
+                                <th>Imóveis Inspec.</th>
+                                <th>Imóveis Trat.</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registrosBody">
+                            <!-- Os dados serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn btn-success" id="btnExportExcel">
+                        <span>📊 Exportar para Excel</span>
+                    </button>
+                    <button class="btn btn-reset" id="btnLimparDados">
+                        <span>🗑️ Limpar Todos os Dados</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 3: EXPORTAR DADOS -->
+        <div id="export-tab" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">
+                    EXPORTAR DADOS
+                    <span>Gerar relatórios em Excel</span>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dataInicio">Data Início</label>
+                        <input type="date" id="dataInicio" name="dataInicio">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataFim">Data Fim</label>
+                        <input type="date" id="dataFim" name="dataFim">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="filtroLocalidade">Filtrar por Localidade</label>
+                        <select id="filtroLocalidade" name="filtroLocalidade">
+                            <option value="">Todas as localidades</option>
+                            <option value="Centro">Centro</option>
+                            <option value="Liberdade">Liberdade</option>
+                            <option value="Belo Horizonte">Belo Horizonte</option>
+                            <option value="Jatobá">Jatobá</option>
+                            <option value="Salgadinho">Salgadinho</option>
+                            <option value="São Sebastião">São Sebastião</option>
+                            <option value="Noé Trajano">Noé Trajano</option>
+                            <option value="Boa Esperança">Boa Esperança</option>
+                            <option value="Alto da Tubiba">Alto da Tubiba</option>
+                            <option value="Monte Castelo">Monte Castelo</option>
+                            <option value="Jardim Europa">Jardim Europa</option>
+                            <option value="Jardim Planalto">Jardim Planalto</option>
+                            <option value="Distrito de Santa Gertrudes">Distrito de Santa Gertrudes</option>
+                            <option value="Zona Rural">Zona Rural</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filtroAtividade">Filtrar por Atividade</label>
+                        <select id="filtroAtividade" name="filtroAtividade">
+                            <option value="">Todas as atividades</option>
+                            <option value="1">LI - Levantamento de Índice</option>
+                            <option value="4">T - Tratamento</option>
+                            <option value="2">LI+T - Levantamento de Índice + Tratamento</option>
+                            <option value="5">DF - Delimitação de Foco</option>
+                            <option value="3">PE - Ponto Estratégico</option>
+                            <option value="6">PVE - Pesquisa Vetorial Especial</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn btn-success" id="btnGerarRelatorio">
+                        <span>📈 Gerar Relatório</span>
+                    </button>
+                    <button class="btn" id="btnExportFiltrado">
+                        <span>📋 Exportar Dados Filtrados</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar data atual como padrão
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dataAtividade').value = today;
+            
+            // Carregar dados salvos
+            carregarDados();
+            atualizarFiltros();
+            
+            // Configurar abas
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remover classe active de todas as abas e conteúdos
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Adicionar classe active à aba e conteúdo selecionados
+                    this.classList.add('active');
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                });
+            });
+            
+            // Configurar botão salvar
+            document.getElementById('btnSalvar').addEventListener('click', salvarRegistro);
+            
+            // Configurar botão exportar
+            document.getElementById('btnExportExcel').addEventListener('click', exportarParaExcel);
+            
+            // Configurar botão limpar dados
+            document.getElementById('btnLimparDados').addEventListener('click', limparTodosDados);
+            
+            // Configurar botão gerar relatório
+            document.getElementById('btnGerarRelatorio').addEventListener('click', gerarRelatorio);
+            
+            // Configurar botão exportar filtrado
+            document.getElementById('btnExportFiltrado').addEventListener('click', exportarDadosFiltrados);
+        });
+
+        // Função para salvar registro
+        function salvarRegistro() {
+            // Validação básica
+            const requiredFields = document.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value) {
+                    isValid = false;
+                    field.style.borderColor = 'red';
+                } else {
+                    field.style.borderColor = '#ccc';
+                }
+            });
+            
+            if (!isValid) {
+                mostrarNotificacao('Por favor, preencha todos os campos obrigatórios.', 'error');
+                return;
+            }
+            
+            // Coletar dados do formulário
+            const formData = new FormData(document.getElementById('controleVetorialForm'));
+            const dados = {};
+            
+            for (let [key, value] of formData.entries()) {
+                dados[key] = value;
+            }
+            
+            // Adicionar ID e timestamp
+            dados.id = Date.now();
+            dados.timestamp = new Date().toISOString();
+            
+            // Salvar no localStorage
+            let registros = JSON.parse(localStorage.getItem('controleVetorial') || '[]');
+            registros.push(dados);
+            localStorage.setItem('controleVetorial', JSON.stringify(registros));
+            
+            // Atualizar tabela de dados
+            carregarDados();
+            atualizarFiltros();
+            
+            // Mostrar mensagem de sucesso
+            mostrarNotificacao('Registro salvo com sucesso!', 'success');
+            
+            // Limpar formulário (exceto município)
+            document.getElementById('controleVetorialForm').reset();
+            document.getElementById('municipio').value = 'Patos';
+            
+            // Restaurar data atual
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dataAtividade').value = today;
+        }
+
+        // Função para carregar dados salvos
+        function carregarDados() {
+            const registros = JSON.parse(localStorage.getItem('controleVetorial') || '[]');
+            const tbody = document.getElementById('registrosBody');
+            
+            tbody.innerHTML = '';
+            
+            if (registros.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum registro encontrado</td></tr>';
+                return;
+            }
+            
+            registros.forEach(registro => {
+                const tr = document.createElement('tr');
+                
+                // Formatar data
+                const data = new Date(registro.dataAtividade);
+                const dataFormatada = data.toLocaleDateString('pt-BR');
+                
+                // Obter nome da atividade
+                let atividadeNome = '';
+                switch(registro.atividade) {
+                    case '1': atividadeNome = 'LI'; break;
+                    case '4': atividadeNome = 'T'; break;
+                    case '2': atividadeNome = 'LI+T'; break;
+                    case '5': atividadeNome = 'DF'; break;
+                    case '3': atividadeNome = 'PE'; break;
+                    case '6': atividadeNome = 'PVE'; break;
+                    default: atividadeNome = 'N/A';
+                }
+                
+                tr.innerHTML = `
+                    <td>${dataFormatada}</td>
+                    <td>${registro.localidade}</td>
+                    <td>${registro.zona}</td>
+                    <td>${atividadeNome}</td>
+                    <td>${registro.imoveisInspecionados || 0}</td>
+                    <td>${registro.imoveisTratados || 0}</td>
+                    <td>
+                        <button onclick="visualizarRegistro(${registro.id})" class="btn" style="padding: 5px 10px; font-size: 14px;">👁️ Ver</button>
+                        <button onclick="excluirRegistro(${registro.id})" class="btn btn-reset" style="padding: 5px 10px; font-size: 14px;">🗑️ Excluir</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Função para atualizar filtros
+        function atualizarFiltros() {
+            const registros = JSON.parse(localStorage.getItem('controleVetorial') || '[]');
+            const localidades = [...new Set(registros.map(r => r.localidade))];
+            const selectLocalidade = document.getElementById('filtroLocalidade');
+            
+            // Limpar opções exceto a primeira
+            while (selectLocalidade.children.length > 1) {
+                selectLocalidade.removeChild(selectLocalidade.lastChild);
+            }
+            
+            // Adicionar localidades
+            localidades.forEach(localidade => {
+                if (localidade) {
+                    const option = document.createElement('option');
+                    option.value = localidade;
+                    option.textContent = localidade;
+                    selectLocalidade.appendChild(option);
+                }
+            });
+        }
+
+        // Função para exportar para Excel
+        function exportarParaExcel() {
+            const registros = JSON.parse(localStorage.getItem('controleVetorial') || '[]');
+            
+            if (registros.length === 0) {
+                mostrarNotificacao('Não há dados para exportar.', 'error');
+                return;
+            }
+            
+            // Preparar dados para exportação
+            const dadosExportacao = registros.map(registro => {
+                // Formatar dados para melhor legibilidade
+                let atividadeNome = '';
+                switch(registro.atividade) {
+                    case '1': atividadeNome = 'LI - Levantamento de Índice'; break;
+                    case '4': atividadeNome = 'T - Tratamento'; break;
+                    case '2': atividadeNome = 'LI+T - Levantamento de Índice + Tratamento'; break;
+                    case '5': atividadeNome = 'DF - Delimitação de Foco'; break;
+                    case '3': atividadeNome = 'PE - Ponto Estratégico'; break;
+                    case '6': atividadeNome = 'PVE - Pesquisa Vetorial Especial'; break;
+                    default: atividadeNome = 'N/A';
+                }
+                
+                let categoriaLocalidade = '';
+                switch(registro.categoriaLocalidade) {
+                    case '1': categoriaLocalidade = 'Sede'; break;
+                    case '2': categoriaLocalidade = 'Outros'; break;
+                    default: categoriaLocalidade = 'N/A';
+                }
+                
+                let tipoVisita = '';
+                switch(registro.tipoVisita) {
+                    case 'N': tipoVisita = 'Normal'; break;
+                    case 'R': tipoVisita = 'Recuperada'; break;
+                    default: tipoVisita = 'N/A';
+                }
+                
+                let pendencia = '';
+                switch(registro.pendencia) {
+                    case 'F': pendencia = 'Fechado'; break;
+                    case 'R': pendencia = 'Recusa'; break;
+                    default: pendencia = 'Nenhuma';
+                }
+                
+                let zonaConcluida = '';
+                switch(registro.zonaConcluida) {
+                    case 'S': zonaConcluida = 'Sim'; break;
+                    case 'N': zonaConcluida = 'Não'; break;
+                    default: zonaConcluida = 'N/A';
+                }
+                
+                return {
+                    'Data': registro.dataAtividade,
+                    'Município': registro.municipio,
+                    'Localidade': registro.localidade,
+                    'Categoria': categoriaLocalidade,
+                    'Zona': registro.zona,
+                    'Zona Concluída': zonaConcluida,
+                    'Atividade': atividadeNome,
+                    'Quarteirão': registro.quarteirao,
+                    'Hora Visita': registro.horaVisita,
+                    'Tipo Visita': tipoVisita,
+                    'Pendência': pendencia,
+                    'Tipo Imóvel': registro.tipoImovel,
+                    'Dep. Inspecionados': registro.depositosInspecionados || 0,
+                    'Dep. A1': registro.depA1 || 0,
+                    'Dep. A2': registro.depA2 || 0,
+                    'Dep. B': registro.depB || 0,
+                    'Dep. C': registro.depC || 0,
+                    'Dep. D1': registro.depD1 || 0,
+                    'Dep. D2': registro.depD2 || 0,
+                    'Dep. E': registro.depE || 0,
+                    'Imóveis Inspecionados': registro.imoveisInspecionados || 0,
+                    'Imóveis Tratados': registro.imoveisTratados || 0,
+                    'Coleta Amostra': registro.coletaAmostra ? 'Sim' : 'Não',
+                    'Nº Amostra': registro.numeroAmostra || '',
+                    'Qtde Tubitos': registro.quantidadeTubitos || 0,
+                    'Tipo Larvicida': registro.tipoLarvicida || '',
+                    'Qtde Larvicida': registro.quantidadeLarvicida || 0,
+                    'Dep. Trat. Larvicida': registro.depositosTratadosLarvicida || 0,
+                    'Tipo Adulticida': registro.tipoAdulticida || '',
+                    'Qtde Adulticida': registro.quantidadeAdulticida || 0,
+                    'Dep. Eliminados': registro.depositosEliminados || 0,
+                    'Assinatura Agente': registro.assinaturaAgente,
+                    'Assinatura Supervisor': registro.assinaturaSupervisor
+                };
+            });
+            
+            // Criar planilha
+            const ws = XLSX.utils.json_to_sheet(dadosExportacao);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Controle Vetorial Patos');
+            
+            // Exportar arquivo
+            const fileName = `controle_vetorial_patos_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            mostrarNotificacao('Dados exportados com sucesso!', 'success');
+        }
+
+        // Função para exportar dados filtrados
+        function exportarDadosFiltrados() {
+            const dataInicio = document.getElementById('dataInicio').value;
+            const dataFim = document.getElementById('dataFim').value;
+            const localidade = document.getElementById('filtroLocalidade').value;
+            const atividade = document.getElementById('filtroAtividade').value;
+            
+            let registros = JSON.parse(localStorage.getItem('controleVetorial') || '[]');
+            
+            // Aplicar filtros
+            if (dataInicio) {
+                registros = registros.filter(r => r.dataAtividade >= dataInicio);
+            }
+            
+            if (dataFim) {
+                registros = registros.filter(r => r.dataAtividade <= dataFim);
+            }
+            
+            if (localidade) {
+                registros = registros.filter(r => r.localidade === localidade);
+            }
+            
+            if (atividade) {
+                registros = registros.filter(r => r.atividade === atividade);
+            }
+            
+            if (registros.length === 0) {
+                mostrarNotificacao('Não há dados para exportar com os filtros selecionados.', 'error');
+                return;
+            }
+            
+            // Preparar dados para exportação (mesma lógica da função exportarParaExcel)
+            const dadosExportacao = registros.map(registro => {
+                let atividadeNome = '';
+                switch(registro.atividade) {
+                    case '1': atividadeNome = 'LI - Levantamento de Índice'; break;
+                    case '4': atividadeNome = 'T - Tratamento'; break;
+                    case '2': atividadeNome = 'LI+T - Levantamento de Índice + Tratamento'; break;
+                    case '5': atividadeNome = 'DF - Delimitação de Foco'; break;
+                    case '3': atividadeNome = 'PE - Ponto Estratégico'; break;
+                    case '6': atividadeNome = 'PVE - Pesquisa Vetorial Especial'; break;
+                    default: atividadeNome = 'N/A';
+                }
+                
+                // ... (restante do código de formatação)
+                return {
+                    'Data': registro.dataAtividade,
+                    'Município': registro.municipio,
+                    'Localidade': registro.localidade,
+                    // ... (mesmos campos da função exportarParaExcel)
+                    'Assinatura Agente': registro.assinaturaAgente,
+                    'Assinatura Supervisor': registro.assinaturaSupervisor
+                };
+            });
+            
+            // Criar planilha
+            const ws = XLSX.utils.json_to_sheet(dadosExportacao);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Controle Vetorial Filtrado');
+            
+            // Exportar arquivo
+            const fileName = `controle_vetorial_patos_filtrado_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            mostrarNotificacao('Dados filtrados exportados com sucesso!', 'success');
+        }
+
+        // Função para gerar relatório
+        function gerarRelatorio() {
+            // Esta função poderia gerar um relatório mais elaborado
+            // Por enquanto, vamos apenas exportar os dados filtrados
+            exportarDadosFiltrados();
+        }
+
+        // Função para visualizar registro
+        function visualizarRegistro(id) {
+            const registros = JSON.parse(localStorage.getItem('controleVetorial') || '[]');
+            const registro = registros.find(r => r.id == id);
+            
+            if (registro) {
+                // Preencher formulário com os dados do registro
+                Object.keys(registro).forEach(key => {
+                    const field = document.querySelector(`[name="${key}"]`);
+                    if (field) {
+                        if (field.type === 'checkbox') {
+                            field.checked = registro[key] === true || registro[key] === 'on';
+                        } else {
+                            field.value = registro[key];
+                        }
+                    }
+                });
+                
+                // Mudar para a aba do formulário
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.querySelector('[data-tab="form"]').classList.add('active');
+                document.getElementById('form-tab').classList.add('active');
+                
+                mostrarNotificacao('Registro carregado para visualização.', 'success');
+            }
+        }
+
+        // Função para excluir registro
+        function excluirRegistro(id) {
+            if (confirm('Tem certeza que deseja excluir este registro?')) {
+                let registros = JSON.parse(localStorage.getItem('controleVetorial') || '[]');
+                registros = registros.filter(r => r.id != id);
+                localStorage.setItem('controleVetorial', JSON.stringify(registros));
+                
+                carregarDados();
+                atualizarFiltros();
+                
+                mostrarNotificacao('Registro excluído com sucesso!', 'success');
+            }
+        }
+
+        // Função para limpar todos os dados
+        function limparTodosDados() {
+            if (confirm('Tem certeza que deseja excluir TODOS os registros? Esta ação não pode ser desfeita.')) {
+                localStorage.removeItem('controleVetorial');
+                carregarDados();
+                atualizarFiltros();
+                
+                mostrarNotificacao('Todos os registros foram excluídos.', 'success');
+            }
+        }
+
+        // Função para mostrar notificações
+        function mostrarNotificacao(mensagem, tipo) {
+            const notification = document.getElementById('notification');
+            notification.textContent = mensagem;
+            notification.className = `notification ${tipo}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
